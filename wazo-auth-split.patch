@@ -1,0 +1,69 @@
+diff --git a/wazo_auth/config.py b/wazo_auth/config.py
+index 27984daf..bdd06ad6 100644
+--- a/wazo_auth/config.py
++++ b/wazo_auth/config.py
+@@ -1,4 +1,4 @@
+-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
++# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+ # SPDX-License-Identifier: GPL-3.0-or-later
+ 
+ import argparse
+@@ -14,6 +14,7 @@ _DEFAULT_CONFIG = {
+     'user': 'wazo-auth',
+     'config_file': '/etc/wazo-auth/config.yml',
+     'extra_config_files': '/etc/wazo-auth/conf.d',
++    'update_policy_on_startup': True,
+     'log_level': 'info',
+     'log_filename': '/var/log/wazo-auth.log',
+     'default_token_lifetime': TWO_HOURS,
+diff --git a/wazo_auth/controller.py b/wazo_auth/controller.py
+index c6b44f64..c797f449 100644
+--- a/wazo_auth/controller.py
++++ b/wazo_auth/controller.py
+@@ -185,10 +185,11 @@ class Controller:
+         signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
+ 
+         with db_ready(timeout=self._config['db_connect_retry_timeout_seconds']):
+-            self._default_policy_service.update_policies()
+-            self._all_users_service.update_policies()
+-            self._default_group_service.update_groups()
+-            self._default_policy_service.delete_orphan_policies()
++            if self._config['update_policy_on_startup']:
++                self._default_policy_service.update_policies()
++                self._all_users_service.update_policies()
++                self._default_group_service.update_groups()
++                self._default_policy_service.delete_orphan_policies()
+             http.init_top_tenant(self.dao)
+             if self._config['bootstrap_user_on_startup']:
+                 bootstrap.create_initial_user(
+diff --git a/wazo_auth/token.py b/wazo_auth/token.py
+index 970781e8..d8e03af2 100644
+--- a/wazo_auth/token.py
++++ b/wazo_auth/token.py
+@@ -111,18 +111,22 @@ class ExpiredTokenRemover:
+         self._bus_publisher = bus_publisher
+         self._cleanup_interval = config['token_cleanup_interval']
+         self._debug = config['debug']
++        if self._cleanup_interval < 1:
++            return
+ 
+         self._tombstone = threading.Event()
+         self._thread = threading.Thread(target=self._loop)
+         self._thread.daemon = True
+ 
+     def start(self):
+-        self._thread.start()
++        if self._cleanup_interval > 0:
++            self._thread.start()
+ 
+     def stop(self):
+-        self._tombstone.set()
+-        self._thread.join()
+-        self._tombstone.clear()
++        if self._cleanup_interval > 0:
++            self._tombstone.set()
++            self._thread.join()
++            self._tombstone.clear()
+ 
+     def _loop(self):
+         while not self._tombstone.is_set():
