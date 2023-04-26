@@ -1,8 +1,9 @@
-## Configuration de PostgresSQL
-1. Augmenter le nombre de connexion max de postgresql si ce n'est pas déjà fait
-
 ## Modification de wazo-auth
-1. Copier le patch sur le serveur 
+1. Copier le patch sur le serveur
+```
+cd
+wget "https://raw.githubusercontent.com/pc-m/wazo-auth-split/main/wazo-auth-split.patch"
+```
 2. Appliquer le patch
 ```
 patch -p1 -d /usr/lib/python3/dist-packages < ~/wazo-auth-split.patch
@@ -22,6 +23,10 @@ wazo-auth-cli token create
 
 ## Configurer la deuxième instance de wazo-auth
 5. Copier la configuration sur le serveur
+```
+cd
+wget "https://github.com/pc-m/wazo-auth-split/raw/main/wazo-auth-token.tar"
+```
 6. Extraire le tar à la racine
 ```
 tar -C / -xvf wazo-auth-token.tar
