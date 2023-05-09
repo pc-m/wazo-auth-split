@@ -2,11 +2,11 @@
 1. Copier le patch sur le serveur
 ```
 cd
-wget "https://raw.githubusercontent.com/pc-m/wazo-auth-split/main/wazo-auth-split.patch"
+wget "https://raw.githubusercontent.com/pc-m/wazo-auth-split/main/wazo-auth-split-23.06.patch"
 ```
 2. Appliquer le patch
 ```
-patch -p1 -d /usr/lib/python3/dist-packages < ~/wazo-auth-split.patch
+patch -p1 -d /usr/lib/python3/dist-packages < ~/wazo-auth-split-23.06.patch
 ```
 3. Redémarrer wazo-auth
 ```
