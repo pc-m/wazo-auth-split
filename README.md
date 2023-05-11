@@ -76,3 +76,11 @@ nginx -t
 ```
 systemctl reload nginx
 ```
+
+
+## Updating the configuration tarball
+
+```
+rm wazo-auth-token.tar
+tar -cf wazo-auth-token.tar etc
+```
