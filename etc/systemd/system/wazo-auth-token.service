@@ -1,0 +1,15 @@
+[Unit]
+Description=wazo-auth-token server
+After=network.target postgresql.service
+StartLimitBurst=15
+StartLimitIntervalSec=150
+
+[Service]
+ExecStart=/usr/bin/wazo-auth --config-file /etc/wazo-auth-token/config-token.yml
+ExecStartPost=/usr/bin/wazo-auth-wait
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
