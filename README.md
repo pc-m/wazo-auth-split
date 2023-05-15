@@ -29,7 +29,7 @@ wget "https://github.com/pc-m/wazo-auth-split/raw/main/wazo-auth-token.tar"
 ```
 6. Extraire le tar à la racine
 ```
-tar -C / -xvf wazo-auth-token.tar
+tar -C / -xvof wazo-auth-token.tar
 ```
 7. Copier les fichiers de config wazo-auth vers auth-token
 ```
